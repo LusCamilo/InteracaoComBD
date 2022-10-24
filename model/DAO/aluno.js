@@ -133,7 +133,6 @@ const deleteAluno = async function (id) {
         return false
 
     }
-
 }
 
 //funcao para retornar todos os registros do banco de dados
