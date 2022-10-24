@@ -15,11 +15,3 @@
     <img height="50em" src="https://dashboard.snapcraft.io/site_media/appmedia/2020/04/mysql-workbench.png">
 </div>
 
-<style>
-
-    .tecs{
-        display:flex;
-        gap: 20px;
-    }
-
-</style>
