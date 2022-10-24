@@ -1,0 +1,19 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+}
+
+//para realizar o primeiro acesso ao BD é importante criar um model 
+//e isso deve ser pelo menos na primeira vez, para saber
+//se o prisma esta com acesso ao BD
+//model tbl_usuario{
+//id Int @id @default(autoincrement())
+//nome String
+//}
