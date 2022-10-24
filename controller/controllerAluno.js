@@ -14,12 +14,12 @@ const novoAluno = async function (aluno) {
     //validacao de campos obrigatorios
     if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.rg == '' || aluno.cpf == '' || aluno.email == '' || aluno.data_nasc == '') {
 
-        return {status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS}
+        return { status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS }
 
         //validacao para verificar email valido
     } else if (!aluno.email.includes('@')) {
 
-        return {status: 400, message: MESSAGE_ERROR.INVALID_EMAIL}
+        return { status: 400, message: MESSAGE_ERROR.INVALID_EMAIL }
 
     } else {
 
@@ -31,10 +31,10 @@ const novoAluno = async function (aluno) {
 
 
         if (result) {
-            return {status: 201, message: MESSAGE_SUCCESS.INSERT_ITEM}
+            return { status: 201, message: MESSAGE_SUCCESS.INSERT_ITEM }
         } else {
 
-            return {status: 500, message:MESSAGE_ERROR.INTERNAL_ERROR_DB}
+            return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
 
         }
 
@@ -46,16 +46,16 @@ const atualizarAluno = async function (aluno) {
     //validacao de campos obrigatorios
     if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.rg == '' || aluno.cpf == '' || aluno.email == '' || aluno.data_nasc == '') {
 
-        return {status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS}
+        return { status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS }
 
         //validacao para verificar email valido
     } else if (!aluno.email.includes('@')) {
 
-        return {status: 400, message: MESSAGE_ERROR.INVALID_EMAIL}
+        return { status: 400, message: MESSAGE_ERROR.INVALID_EMAIL }
 
-    }else if (aluno.id == ''|| aluno.id == undefined) {
-        
-        return {status: 400,  message: MESSAGE_ERROR.REQUIRED_ID}
+    } else if (aluno.id == '' || aluno.id == undefined) {
+
+        return { status: 400, message: MESSAGE_ERROR.REQUIRED_ID }
 
     } else {
 
@@ -67,10 +67,10 @@ const atualizarAluno = async function (aluno) {
 
 
         if (result) {
-            return {status: 201, message: MESSAGE_SUCCESS.UPDATE_ITEM}
+            return { status: 201, message: MESSAGE_SUCCESS.UPDATE_ITEM }
         } else {
 
-            return {status: 500, message:MESSAGE_ERROR.INTERNAL_ERROR_DB}
+            return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
 
         }
 
@@ -81,10 +81,10 @@ const deletarAluno = async function (id) {
 
 
     if (id == '' && id == undefined) {
-        
-        return {status: 400,  message: MESSAGE_ERROR.REQUIRED_ID}
 
-    }else{
+        return { status: 400, message: MESSAGE_ERROR.REQUIRED_ID }
+
+    } else {
 
         //import da model de alunos
         const deletarAluno = require('../model/DAO/aluno.js')
@@ -94,10 +94,10 @@ const deletarAluno = async function (id) {
 
 
         if (result) {
-            return {status: 201, message: MESSAGE_SUCCESS.DELETE_ITEM}
+            return { status: 201, message: MESSAGE_SUCCESS.DELETE_ITEM }
         } else {
 
-            return {status: 500, message:MESSAGE_ERROR.INTERNAL_ERROR_DB}
+            return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
 
         }
     }
@@ -123,5 +123,30 @@ const listarAluno = async function () {
     }
 
 }
+const buscarAluno = async function (id) {
 
-module.exports = { listarAluno, novoAluno, atualizarAluno, deletarAluno }
+    if (id == '' && id == undefined) {
+
+        return { status: 400, message: MESSAGE_ERROR.REQUIRED_ID }
+
+    } else {
+        
+        let dadosAlunoJSON = {}
+
+        const { selectByIDAluno } = require('../model/DAO/aluno.js')
+
+        const dadosAluno = await selectByIDAluno(id)
+
+        if (dadosAluno) {
+
+            dadosAlunoJSON.aluno = dadosAluno
+            return dadosAlunoJSON
+
+        } else {
+            return false
+        }
+    }
+
+}
+
+module.exports = { listarAluno, novoAluno, atualizarAluno, deletarAluno, buscarAluno }

@@ -45,7 +45,7 @@ const insertAluno = async function (aluno) {
 
         //executa o script sql no banco de dados ($executeRawUnsafe permite encaminhar um variavel contendo um script
         const result = await prisma.$executeRawUnsafe(sql)
-        
+
         // verifica se on script foi executado com sucesso no banco de dados
         if (result) {
             return true
@@ -87,7 +87,7 @@ const updateAluno = async function (aluno) {
 
         //executa o script sql no banco de dados ($executeRawUnsafe permite encaminhar um variavel contendo um script)
         const result = await prisma.$executeRawUnsafe(sql)
-        
+
         // verifica se on script foi executado com sucesso no banco de dados
         if (result) {
             return true
@@ -120,7 +120,7 @@ const deleteAluno = async function (id) {
 
         //executa o script sql no banco de dados ($executeRawUnsafe permite encaminhar um variavel contendo um script)
         const result = await prisma.$executeRawUnsafe(sql)
-        
+
         // verifica se on script foi executado com sucesso no banco de dados
         if (result) {
             return true
@@ -156,5 +156,38 @@ const selectAllAlunos = async function () {
 
 
 }
+const selectByIDAluno = async function (id) {
 
-module.exports = { selectAllAlunos, insertAluno, updateAluno, deleteAluno}
+    //import da classe prismaClient, que é respnsavel pelas interacoes com BD
+    const { PrismaClient } = require('@prisma/client')
+
+    //instancia da classe PrismaClient
+    const prisma = new PrismaClient()
+
+    let sql = `select cast(id as float) as 
+        id, 
+        nome, 
+        foto, 
+        sexo, 
+        rg, 
+        cpf, 
+        email, 
+        telefone, 
+        celular, 
+        data_nasc 
+        from tbl_aluno 
+        where id = ${id};
+    `
+    console.log(sql)
+    //atraves de um script SQL (select)
+    const rsAluno = await prisma.$queryRawUnsafe(sql)
+
+    if (rsAluno.length > 0){
+        return rsAluno
+    }    
+    else{
+        return false
+    }
+}
+
+module.exports = { selectAllAlunos, insertAluno, updateAluno, deleteAluno, selectByIDAluno }
