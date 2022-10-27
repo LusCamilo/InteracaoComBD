@@ -15,7 +15,8 @@ const MESSAGE_ERROR = {
     EMPTY_BODY          : 'O body da requisição não pode ser vazio',
     NOT_FOUND_DB        : 'Não foram encontrados registros no banco de dados',
     INTERNAL_ERROR_DB   : 'Não foi possivel realizar a operação com o banco de dados' ,
-    REQUIRED_ID         : 'ID é necessario para realizar a requisição'
+    REQUIRED_ID         : 'ID é necessario para realizar a requisição',
+    
 
 }
 const MESSAGE_SUCCESS = {

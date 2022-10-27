@@ -10,7 +10,7 @@
 
 //funcao para inserir um novo registro no banco de dados
 
-const insertAluno = async function (aluno) {
+const insertAluno = async (aluno) => {
 
     try {
 
@@ -62,7 +62,7 @@ const insertAluno = async function (aluno) {
 }
 
 //funcao para atualizar um registro no banco de dados
-const updateAluno = async function (aluno) {
+const updateAluno = async (aluno) => {
 
     try {
 
@@ -105,7 +105,7 @@ const updateAluno = async function (aluno) {
 }
 
 //funcao para deletar um registro no banco de dados
-const deleteAluno = async function (id) {
+const deleteAluno = async (id) => {
 
 
     try {
@@ -136,7 +136,7 @@ const deleteAluno = async function (id) {
 }
 
 //funcao para retornar todos os registros do banco de dados
-const selectAllAlunos = async function () {
+const selectAllAlunos = async () => {
 
     //import da classe prismaClient, que é respnsavel pelas interacoes com BD
     const { PrismaClient } = require('@prisma/client')
@@ -150,13 +150,14 @@ const selectAllAlunos = async function () {
 
     if (rsAlunos.length > 0)
         return rsAlunos
+
     else
         return false
 
 
 
 }
-const selectByIDAluno = async function (id) {
+const selectByIDAluno = async (id) => {
 
     //import da classe prismaClient, que é respnsavel pelas interacoes com BD
     const { PrismaClient } = require('@prisma/client')
@@ -178,14 +179,14 @@ const selectByIDAluno = async function (id) {
         from tbl_aluno 
         where id = ${id};
     `
-    console.log(sql)
+ 
     //atraves de um script SQL (select)
     const rsAluno = await prisma.$queryRawUnsafe(sql)
 
-    if (rsAluno.length > 0){
+    if (rsAluno.length > 0) {
         return rsAluno
-    }    
-    else{
+    }
+    else {
         return false
     }
 }

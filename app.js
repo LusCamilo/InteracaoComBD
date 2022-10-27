@@ -40,8 +40,7 @@ const jsonParser = bodyParser.json()
 * Data: 10/10/2022                                                          *
 ****************************************************************************/
 
-//Lista de todos os alunos
-app.get('/alunos', cors(), async function (request, response, next) {
+app.get('/v1/alunos', cors(), async function (request, response, next) {
 
     let statusCode
     let message
@@ -62,7 +61,7 @@ app.get('/alunos', cors(), async function (request, response, next) {
     response.json(message)
 
 })
-app.get('/aluno/:id', cors(), async function (request, response, next) {
+app.get('/v1/aluno/:id', cors(), async function (request, response, next) {
 
     let statusCode
     let message
@@ -90,8 +89,7 @@ app.get('/aluno/:id', cors(), async function (request, response, next) {
     response.status(statusCode)
     response.json(message)
 })
-//insere um novo aluno
-app.post('/aluno', cors(), jsonParser, async function (request, response) {
+app.post('/v1/aluno', cors(), jsonParser, async function (request, response) {
 
     let statusCode
     let message
@@ -101,7 +99,7 @@ app.post('/aluno', cors(), jsonParser, async function (request, response) {
     headerContentType = request.headers['content-type']
 
     //validar se content type é do tipo  
-    //application/json
+    //v1/application/json
     if (headerContentType == 'application/json') {
 
         //recebe do corpo da mensagem conteudo
@@ -134,7 +132,7 @@ app.post('/aluno', cors(), jsonParser, async function (request, response) {
     response.json(message)
 
 })
-app.put('/aluno/:id', cors(), jsonParser, async function (request, response) {
+app.put('/v1/aluno/:id', cors(), jsonParser, async function (request, response) {
 
     let statusCode
     let message
@@ -143,8 +141,6 @@ app.put('/aluno/:id', cors(), jsonParser, async function (request, response) {
     //recebe o tipo de content-type que foi enviado no header da aquisicao  
     headerContentType = request.headers['content-type']
 
-    //validar se content type é do tipo  
-    //application/json
     if (headerContentType == 'application/json') {
 
         //recebe do corpo da mensagem conteudo
@@ -191,22 +187,202 @@ app.put('/aluno/:id', cors(), jsonParser, async function (request, response) {
     response.json(message)
 
 })
-app.delete('/aluno/:id', cors(), jsonParser, async function (request, response) {
+app.delete('/v1/aluno/:id', cors(), jsonParser, async function (request, response) {
 
     let statusCode
     let message
 
     let id = request.params.id
-    //validacao do id na requisição
+
+
     if (id != '' && id != undefined) {
 
         const controllerAluno = require('./controller/controllerAluno.js')
-        //encaminha os dados do body
-
+        
+        const buscarAluno = await controllerAluno.buscarAluno(id)
+        
         const excluirAluno = await controllerAluno.deletarAluno(id)
 
         statusCode = excluirAluno.status
         message = excluirAluno.message
+
+    } else {
+
+        statusCode = 400
+        message = MESSAGE_ERROR.REQUIRED_ID
+
+    }
+
+    response.status(statusCode)
+    response.json(message)
+
+})
+app.get('/v1/cursos', cors(), async function (request, response, next) {
+
+    let statusCode
+    let message
+
+    const controllerCurso = require('./controller/controllerCurso.js')
+    const dadosCurso = await controllerCurso.listarCurso()
+
+    if (dadosCurso) {
+
+        statusCode = 200
+        message = dadosCurso
+
+    } else {
+        statusCode = 400
+        message = MESSAGE_ERROR.NOT_FOUND_DB
+    }
+    response.status(statusCode)
+    response.json(message)
+
+})
+app.get('/v1/curso/:id', cors(), async function (request, response, next) {
+
+    let statusCode
+    let message
+    let id = request.params.id
+
+    if (id != '' && id != undefined) {
+        const controllerCurso = require('./controller/controllerCurso.js')
+        const dadosCurso = await controllerCurso.buscarCurso(id)
+
+        if (dadosCurso) {
+
+            statusCode = 200
+            message = dadosCurso
+
+        } else {
+            statusCode = 400
+            message = MESSAGE_ERROR.NOT_FOUND_DB
+        }
+    }else{
+        
+        statusCode = 400
+        message == MESSAGE_ERROR.REQUIRED_ID
+        
+    }
+    response.status(statusCode)
+    response.json(message)
+})
+app.post('/v1/curso', cors(), jsonParser, async function (request, response) {
+
+    let statusCode
+    let message
+    let headerContentType
+
+    //recebe o tipo de content-type que foi enviado no header da aquisicao  
+    headerContentType = request.headers['content-type']
+
+    //validar se content type é do tipo  
+    //v1/application/json
+    if (headerContentType == 'application/json') {
+
+        //recebe do corpo da mensagem conteudo
+        let dadosBody = request.body
+
+        if (JSON.stringify(dadosBody) != '{}') {
+
+            const controllerCurso = require('./controller/controllerCurso.js')
+            //encaminha os dados do body
+            const novocurso = await controllerCurso.novoCurso(dadosBody)
+
+
+            statusCode = novocurso.status
+            message = novocurso.message
+
+        } else {
+
+            statusCode = 404
+            message = MESSAGE_ERROR.EMPTY_BODY
+
+        }
+
+    } else {
+
+        statusCode = 415
+        message = MESSAGE_ERROR.CONTENT_TYPE
+
+    }
+    response.status(statusCode)
+    response.json(message)
+
+})
+app.put('/v1/curso/:id', cors(), jsonParser, async function (request, response) {
+
+    let id = request.params.id
+    let statusCode
+    let message
+    let headerContentType
+
+    //recebe o tipo de content-type que foi enviado no header da aquisicao  
+    headerContentType = request.headers['content-type']
+
+    if (headerContentType == 'application/json') {
+
+        //recebe do corpo da mensagem conteudo
+        let dadosBody = request.body
+
+        if (JSON.stringify(dadosBody) != '{}') {
+            //recebe o id enviado por parametro na requisição
+            
+
+            //validacao do id na requisição
+            if (id != '' && id != undefined) {
+
+                dadosBody.id = id
+                const controllerCurso = require('./controller/controllerCurso.js')
+                //encaminha os dados do body
+
+                const atualizarCurso= await controllerCurso.atualizarCurso(dadosBody)
+
+
+                statusCode = atualizarCurso.status
+                message = atualizarCurso.message
+
+            } else {
+
+                statusCode = 400
+                message = MESSAGE_ERROR.REQUIRED_ID
+
+            }
+
+        } else {
+
+            statusCode = 404
+            message = MESSAGE_ERROR.EMPTY_BODY
+
+        }
+
+    } else {
+
+        statusCode = 415
+        message = MESSAGE_ERROR.CONTENT_TYPE
+
+    }
+    response.status(statusCode)
+    response.json(message)
+
+})
+app.delete('/v1/curso/:id', cors(), jsonParser, async function (request, response) {
+
+    let statusCode
+    let message
+
+    let id = request.params.id
+
+
+    if (id != '' && id != undefined) {
+
+        const controllerCurso = require('./controller/controllerCurso.js')
+        
+        const buscarCurso = await controllerCurso.buscarCurso(id)
+        
+        const excluirCurso = await controllerCurso.deletarCurso(id)
+
+        statusCode = excluirCurso.status
+        message = excluirCurso.message
 
     } else {
 

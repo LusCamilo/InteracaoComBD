@@ -9,7 +9,7 @@
 ***********************************************************************/
 
 const { MESSAGE_SUCCESS, MESSAGE_ERROR } = require('../messages/config.js')
-const novoAluno = async function (aluno) {
+const novoAluno = async (aluno) => {
 
     //validacao de campos obrigatorios
     if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.rg == '' || aluno.cpf == '' || aluno.email == '' || aluno.data_nasc == '') {
@@ -41,7 +41,7 @@ const novoAluno = async function (aluno) {
     }
 
 }
-const atualizarAluno = async function (aluno) {
+const atualizarAluno = async (aluno) => {
 
     //validacao de campos obrigatorios
     if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.rg == '' || aluno.cpf == '' || aluno.email == '' || aluno.data_nasc == '') {
@@ -77,7 +77,7 @@ const atualizarAluno = async function (aluno) {
     }
 
 }
-const deletarAluno = async function (id) {
+const deletarAluno = async (id) => {
 
 
     if (id == '' && id == undefined) {
@@ -86,24 +86,33 @@ const deletarAluno = async function (id) {
 
     } else {
 
-        //import da model de alunos
-        const deletarAluno = require('../model/DAO/aluno.js')
+        const buscaDeAluno = await buscarAluno(id)
 
-        //chama a funcao para inserir um novo aluno
-        const result = await deletarAluno.deleteAluno(id)
+        if (buscaDeAluno) {
 
+            //import da model de alunos
+            const deletarAluno = require('../model/DAO/aluno.js')
 
-        if (result) {
-            return { status: 201, message: MESSAGE_SUCCESS.DELETE_ITEM }
+            const result = await deletarAluno.deleteAluno(id)
+
+            if (result) {
+
+                return { status: 201, message: MESSAGE_SUCCESS.DELETE_ITEM }
+
+            } else {
+
+                return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+
+            }
         } else {
 
-            return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+            return { status: 404, message: MESSAGE_ERROR.NOT_FOUND_DB }
 
         }
-    }
 
+    }
 }
-const listarAluno = async function () {
+const listarAluno = async () => {
 
     let dadosAlunosJSON = {}
 
@@ -115,7 +124,6 @@ const listarAluno = async function () {
     if (dadosAlunos) {
 
         //dadosAlunos.reverse()
-
         dadosAlunosJSON.alunos = dadosAlunos
         return dadosAlunosJSON
     } else {
@@ -123,14 +131,14 @@ const listarAluno = async function () {
     }
 
 }
-const buscarAluno = async function (id) {
+const buscarAluno = async (id) => {
 
     if (id == '' && id == undefined) {
 
         return { status: 400, message: MESSAGE_ERROR.REQUIRED_ID }
 
     } else {
-        
+
         let dadosAlunoJSON = {}
 
         const { selectByIDAluno } = require('../model/DAO/aluno.js')
