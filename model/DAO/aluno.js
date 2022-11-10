@@ -157,7 +157,7 @@ const selectAllAlunos = async () => {
 
 
 }
-const selectByIDAluno = async (id) => {
+const selectByIdAluno = async (id) => {
 
     //import da classe prismaClient, que é respnsavel pelas interacoes com BD
     const { PrismaClient } = require('@prisma/client')
@@ -179,7 +179,7 @@ const selectByIDAluno = async (id) => {
         from tbl_aluno 
         where id = ${id};
     `
- 
+
     //atraves de um script SQL (select)
     const rsAluno = await prisma.$queryRawUnsafe(sql)
 
@@ -191,4 +191,28 @@ const selectByIDAluno = async (id) => {
     }
 }
 
-module.exports = { selectAllAlunos, insertAluno, updateAluno, deleteAluno, selectByIDAluno }
+/**
+ *  funcoes responsaveis por administração
+ */
+
+const selectLastId = async () => {
+
+    //import da classe prismaClient, que é respnsavel pelas interacoes com BD
+    const { PrismaClient } = require('@prisma/client')
+
+    //instancia da classe PrismaClient
+    const prisma = new PrismaClient()
+
+    let sql = `select cast(id as float) id from tbl_aluno order by id desc limit 1;`
+    console.log(sql)
+    const rsAluno = await prisma.$queryRawUnsafe(sql)
+
+    if (rsAluno) {
+        return rsAluno[0].id
+    }else {
+        return false
+    }
+
+}
+
+module.exports = { selectAllAlunos, insertAluno, updateAluno, deleteAluno, selectByIdAluno, selectLastId }

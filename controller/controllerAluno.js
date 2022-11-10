@@ -12,10 +12,8 @@ const { MESSAGE_SUCCESS, MESSAGE_ERROR } = require('../messages/config.js')
 const novoAluno = async (aluno) => {
 
     //validacao de campos obrigatorios
-    if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.rg == '' || aluno.cpf == '' || aluno.email == '' || aluno.data_nasc == '') {
-
+    if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.foto == undefined || aluno.rg == '' || aluno.rg == undefined || aluno.cpf == '' || aluno.cpf == undefined || aluno.email == '' || aluno.email == undefined || aluno.data_nasc == '' || aluno.data_nasc == undefined) {
         return { status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS }
-
         //validacao para verificar email valido
     } else if (!aluno.email.includes('@')) {
 
@@ -25,26 +23,50 @@ const novoAluno = async (aluno) => {
 
         //import da model de alunos
         const novoAluno = require('../model/DAO/aluno.js')
-
+        //import da model AlunoCurso (tabela de relação entre aluno e curso)
+        const novoAlunoCurso = require('../model/DAO/aluno_curso.js')
         //chama a funcao para inserir um novo aluno
-        const result = await novoAluno.insertAluno(aluno)
+        const resultnovoAluno = await novoAluno.insertAluno(aluno)
 
+        if (resultnovoAluno) {
 
-        if (result) {
-            return { status: 201, message: MESSAGE_SUCCESS.INSERT_ITEM }
+            let idNovoAluno = await novoAluno.selectLastId()
+
+            if (idNovoAluno > 0) {
+
+                let alunoCurso = {}
+                //retorna o ano corrente 
+                let anoMatricula = new Date().getFullYear()
+                //cria a matricula do aluno
+                let numeroMatricula = `${idNovoAluno}${aluno.curso[0].idCurso}${anoMatricula}`
+
+                //cria o objeto json com todas as chaves e valores
+                alunoCurso.idAluno = idNovoAluno
+                alunoCurso.idCurso = aluno.curso[0].idCurso
+                alunoCurso.matricula = numeroMatricula
+                alunoCurso.statusAluno = 'cursando'
+
+                const resultNovoAlunoCurso = await novoAlunoCurso.insertAlunoCurso(alunoCurso)
+
+                if (resultNovoAlunoCurso) {
+                    return { status: 201, message: MESSAGE_SUCCESS.INSERT_ITEM }
+                } else {
+                    await deletarAluno(idNovoAluno)
+                    return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+                }
+            } else {
+                await deletarAluno(idNovoAluno)
+                return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
+            }
         } else {
-
             return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB }
-
         }
-
     }
-
 }
 const atualizarAluno = async (aluno) => {
 
     //validacao de campos obrigatorios
-    if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.rg == '' || aluno.cpf == '' || aluno.email == '' || aluno.data_nasc == '') {
+    if (aluno.nome == '' || aluno.nome == undefined || aluno.foto == '' || aluno.foto == undefined || aluno.rg == '' || aluno.rg == undefined || aluno.cpf == '' || aluno.cpf == undefined || aluno.email == '' || aluno.email == undefined || aluno.data_nasc == '' || aluno.data_nasc == undefined) {
 
         return { status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS }
 
@@ -141,14 +163,33 @@ const buscarAluno = async (id) => {
 
         let dadosAlunoJSON = {}
 
-        const { selectByIDAluno } = require('../model/DAO/aluno.js')
+        const { selectByIdAluno } = require('../model/DAO/aluno.js')
+        const { selectAlunoCurso } = require('../model/DAO/aluno_curso.js')
 
-        const dadosAluno = await selectByIDAluno(id)
+        const dadosAluno = await selectByIdAluno(id)
 
         if (dadosAluno) {
 
-            dadosAlunoJSON.aluno = dadosAluno
-            return dadosAlunoJSON
+            const dadosAlunoCurso = await selectAlunoCurso(id)
+
+            if (dadosAlunoCurso) {
+
+                //adiciona a chave curso dentro do objeto dos dados do aluno e 
+                //acrescenta os dados do curso do Aluno
+
+                dadosAluno[0].curso = dadosAlunoCurso
+
+                //Criamos uma chave alunos no JSON para retornar o array de alunos
+                dadosAlunoJSON.aluno = dadosAluno
+
+                return dadosAlunoJSON
+
+            } else {
+
+                dadosAlunoJSON.aluno = dadosAluno
+                return dadosAlunoJSON
+                
+            }
 
         } else {
             return false
